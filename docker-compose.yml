@@ -4,12 +4,27 @@ services:
     container_name: pianke
     restart: unless-stopped
     ports:
+      # 左边是宿主机端口，可以改成任意未占用的端口
+      # 如需仅本机访问，改为 "127.0.0.1:5057:5057"
       - "5057:5057"
     volumes:
-      - /vol1/1000:/photos
-      - pianke-cache:/root/.cache
+      # ===== 照片目录挂载 =====
+      # 把左边改成你 NAS/主机上照片所在的绝对路径
+      # 示例:
+      #   群晖 NAS:    /volume1/photos:/photos
+      #   飞牛 NAS:    /vol1/1000/Photos:/photos
+      #   Linux/Mac:   /home/user/Photos:/photos
+      #   Windows:     //c/Users/user/Photos:/photos
+      - ./data/photos:/photos
+
+      # 模型缓存（首次下载的 AI 模型，重建不丢失）
+      - pianke-cache:/home/pianke/.cache
     environment:
       - TZ=Asia/Shanghai
+    # 可选：通过 .env 文件配置 API Key 等敏感信息
+    # 取消下行注释并在项目目录创建 .env 文件即可
+    # env_file:
+    #   - .env
 
 volumes:
   pianke-cache:

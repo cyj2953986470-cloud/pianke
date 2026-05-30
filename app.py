@@ -3464,7 +3464,7 @@ def api_peek_folder():
         for entry in os.scandir(p):
             if not entry.is_file(follow_symlinks=False):
                 continue
-            if Path(entry.name).suffix.lower() not in grouper.IMAGE_EXTS:
+            if Path(entry.name).suffix.lower() not in grouper.ALL_INPUT_EXTS:
                 continue
             count += 1
             try:
