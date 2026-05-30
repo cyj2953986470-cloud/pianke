@@ -771,6 +771,22 @@
   </div>
 </div>
 
+<!-- 网页版文件夹浏览器（Docker 环境 fallback） -->
+<div id="folder-browser" class="modal hidden">
+  <div class="modal-card fb-card">
+    <h3>选择文件夹</h3>
+    <div class="fb-toolbar">
+      <input type="text" id="fb-path-input" class="fb-path-input" placeholder="/photos" spellcheck="false" autocomplete="off">
+      <button type="button" id="fb-go" class="btn-ghost btn-small">跳转</button>
+    </div>
+    <div id="fb-list" class="fb-list"></div>
+    <div class="modal-actions">
+      <button id="fb-cancel" class="btn-ghost">取消</button>
+      <button id="fb-select" class="btn btn-primary small">选择此文件夹</button>
+    </div>
+  </div>
+</div>
+
 <script src="/static/app.js?v=20260517f"></script>
 </body>
 </html>

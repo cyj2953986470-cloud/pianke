@@ -3504,3 +3504,87 @@ body:has(#view-processing.active) .status-badge {
   }
   .wm-preview-frame { min-height: 280px; }
 }
+
+/* =========================================================
+   网页版文件夹浏览器（Docker fallback）
+   ========================================================= */
+.fb-card {
+  max-width: 520px;
+  width: 90%;
+}
+.fb-card h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 22px;
+  margin: 0 0 16px;
+}
+.fb-toolbar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.fb-path-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-card);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.fb-path-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.fb-list {
+  max-height: 360px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-card);
+  margin-bottom: 16px;
+}
+.fb-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink-2);
+  cursor: pointer;
+  text-align: left;
+  transition: background .15s var(--ease), color .15s;
+}
+.fb-item:hover {
+  background: var(--bg-warm);
+  color: var(--ink);
+}
+.fb-item + .fb-item {
+  border-top: 1px solid var(--line-faint);
+}
+.fb-parent {
+  color: var(--ink-muted);
+  font-style: italic;
+}
+.fb-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+.fb-loading,
+.fb-empty,
+.fb-error {
+  padding: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+.fb-error {
+  color: var(--accent-deep);
+}

@@ -689,13 +689,94 @@ $("browse-btn").addEventListener("click", async () => {
       requestFolderPeek(r.folder);
     }
   } catch (e) {
-    toast("无法打开选择对话框：" + e.message);
+    // Docker 环境下 zenity 不可用，自动 fallback 到网页版文件夹浏览器
+    openFolderBrowser();
   } finally {
     btn.disabled = false;
   }
 });
 $("folder-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") { e.preventDefault(); handleStart(e); }
+});
+
+// =================================================================
+// 网页版文件夹浏览器（Docker fallback）
+// =================================================================
+let browseCurrentPath = "/";
+
+function openFolderBrowser() {
+  browseCurrentPath = "/";
+  $("folder-browser").classList.remove("hidden");
+  $("fb-path-input").value = browseCurrentPath;
+  loadDirList(browseCurrentPath);
+}
+
+function closeFolderBrowser() {
+  $("folder-browser").classList.add("hidden");
+}
+
+async function loadDirList(path) {
+  const list = $("fb-list");
+  list.innerHTML = '<div class="fb-loading">加载中…</div>';
+  $("fb-path-input").value = path;
+  try {
+    const r = await fetchJSON("/api/list_dirs", {
+      method: "POST",
+      body: JSON.stringify({ path }),
+    });
+    browseCurrentPath = r.current || path;
+    $("fb-path-input").value = browseCurrentPath;
+    renderDirList(r.dirs || [], r.parent);
+  } catch (e) {
+    list.innerHTML = `<div class="fb-error">${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function renderDirList(dirs, parent) {
+  const list = $("fb-list");
+  list.innerHTML = "";
+  if (parent) {
+    const upBtn = document.createElement("button");
+    upBtn.type = "button";
+    upBtn.className = "fb-item fb-parent";
+    upBtn.innerHTML = '<span class="fb-icon">📁</span> ..';
+    upBtn.addEventListener("click", () => loadDirList(parent));
+    list.appendChild(upBtn);
+  }
+  if (!dirs.length && !parent) {
+    list.innerHTML = '<div class="fb-empty">此目录下没有子文件夹</div>';
+    return;
+  }
+  for (const d of dirs) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "fb-item";
+    btn.innerHTML = `<span class="fb-icon">📁</span> ${escapeHtml(d.name)}`;
+    btn.addEventListener("click", () => loadDirList(d.path));
+    list.appendChild(btn);
+  }
+}
+
+$("fb-select").addEventListener("click", () => {
+  $("folder-input").value = browseCurrentPath;
+  $("start-error").textContent = "";
+  requestFolderPeek(browseCurrentPath);
+  closeFolderBrowser();
+});
+
+$("fb-cancel").addEventListener("click", closeFolderBrowser);
+
+$("fb-go").addEventListener("click", () => {
+  const p = $("fb-path-input").value.trim();
+  if (p) loadDirList(p);
+});
+
+$("fb-path-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const p = $("fb-path-input").value.trim();
+    if (p) loadDirList(p);
+  }
 });
 
 // =================================================================

@@ -3403,6 +3403,40 @@ def api_browse_folder():
         return jsonify({"error": str(e)}), 500
 
 
+
+
+@app.route("/api/list_dirs", methods=["POST"])
+def api_list_dirs():
+    """列出指定路径下的子目录（网页版文件夹浏览器用）。"""
+    data = request.get_json(force=True) or {}
+    path = (data.get("path") or "").strip()
+    if not path:
+        # 默认列出根目录和常见挂载点
+        roots = ["/", "/photos"]
+        dirs = []
+        for r in roots:
+            p = Path(r)
+            if p.exists() and p.is_dir():
+                dirs.append({"name": r, "path": r})
+        return jsonify({"ok": True, "current": "/", "dirs": dirs})
+
+    p = Path(path)
+    if not p.exists():
+        return jsonify({"error": "路径不存在"}), 400
+    if not p.is_dir():
+        return jsonify({"error": "不是文件夹"}), 400
+
+    dirs = []
+    try:
+        for entry in sorted(os.scandir(p), key=lambda e: e.name.lower()):
+            if entry.is_dir(follow_symlinks=True) and not entry.name.startswith("."):
+                dirs.append({"name": entry.name, "path": entry.path})
+    except PermissionError:
+        return jsonify({"error": "无权限访问"}), 403
+
+    return jsonify({"ok": True, "current": str(p), "parent": str(p.parent), "dirs": dirs})
+
+
 @app.route("/api/peek_folder", methods=["POST"])
 def api_peek_folder():
     """轻量扫描：仅统计文件数 / 体积 / 时间跨度，不读图像内容。
@@ -3764,7 +3798,7 @@ def main():
         threading.Timer(0.8, lambda: webbrowser.open(url)).start()
     # 仅监听回环：前端依赖 Origin/Referer 严格匹配防 CSRF，绑 0.0.0.0
     # 会把局域网也暴露进来，已被验证会绕过这套校验。
-    app.run(host="127.0.0.1", port=args.port, debug=False)
+    app.run(host="0.0.0.0", port=args.port, debug=False)
 
 
 if __name__ == "__main__":

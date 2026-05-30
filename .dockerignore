@@ -1,0 +1,7 @@
+.venv
+.git
+__pycache__
+*.pyc
+tests/
+启动_macOS.command
+启动_Windows.bat

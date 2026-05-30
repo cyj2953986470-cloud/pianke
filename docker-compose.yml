@@ -1,0 +1,15 @@
+services:
+  pianke:
+    build: .
+    container_name: pianke
+    restart: unless-stopped
+    ports:
+      - "5057:5057"
+    volumes:
+      - /vol1/1000:/photos
+      - pianke-cache:/root/.cache
+    environment:
+      - TZ=Asia/Shanghai
+
+volumes:
+  pianke-cache:
